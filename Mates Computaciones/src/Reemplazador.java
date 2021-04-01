@@ -1,6 +1,6 @@
 
 public class Reemplazador {
-	private String cadenaOriginal,
+	private String cadenaOriginal ,
 					patronER,
 					cadenaReemplazadora,
 					resultado;
