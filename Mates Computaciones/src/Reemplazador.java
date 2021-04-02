@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Reemplazador {
 	private String cadenaOriginal ,
@@ -5,6 +6,7 @@ public class Reemplazador {
 					cadenaReemplazadora,
 					resultado;
 	private String[] arrayER;
+	private ArrayList<Integer> indexAReemplazar ;
 	private int indexInicio,
 				indexFinal;	
 	
@@ -15,6 +17,7 @@ public class Reemplazador {
 		this.indexInicio = this.indexFinal = 0;
 		int cantUnion = contadorCoincidencias(patronER);
 		this.arrayER = new String[cantUnion + 1];
+		indexAReemplazar = new ArrayList<Integer>();
 		fillArray();	
 	}
 	
@@ -50,6 +53,18 @@ public class Reemplazador {
 				return contadorCoincidencias(cadena.substring(1));	
 			}
 		}
+	}
+	public void indexCadenasRemplazar(int indexIn, int indexFi) {
+		String inicioCadena =this.resultado.substring(0, indexIn);
+		String finalCadena =this.resultado.substring(indexFi,this.resultado.length());
+		this.resultado =inicioCadena+this.cadenaReemplazadora+finalCadena;
+	}
+	public void reemplazarCadena() {
+		for(int i = this.indexAReemplazar.size()-1; i >0 ; i=i-2) {
+			indexCadenasRemplazar(this.indexAReemplazar.get(i-1),this.indexAReemplazar.get(i) );
+			
+		}
+		System.out.println(this.resultado);
 	}
 	
 	public void reemplazador() {
@@ -181,8 +196,8 @@ public class Reemplazador {
 											
 									    	System.out.println("Se ha llegado a un match dentro del CASO 2.2");
 									    }
-								   } 			   
-							  		}
+								    } 			   
+							  	}
 							}
 							
 						
@@ -255,7 +270,6 @@ public class Reemplazador {
 						flag = true; //Se ha validado que exista al menos una vez
 						
 					}	
-					
 				}
 				/********/
 
@@ -263,6 +277,8 @@ public class Reemplazador {
 
 				if(this.indexFinal != this.indexInicio && flag ==true) {
 					//hacer el cambio en la copia 
+					this.indexAReemplazar.add(this.indexInicio);
+					this.indexAReemplazar.add(this.indexFinal);
 					System.out.println("Inicio: "+this.indexInicio+" Final: "+this.indexFinal);
 					this.indexInicio = this.indexFinal ;
 					//this.indexFinal++;
@@ -281,11 +297,13 @@ public class Reemplazador {
 		
 	}
 	public static void main(String[] args) {
-		Reemplazador rempExa = new Reemplazador("abaaaabaaanbbb", "ab*","ccc");
+		Reemplazador rempExa = new Reemplazador("abaaaabaaanbbb", "aab*a*","ccc");
 		rempExa.reemplazador();
-		
-		System.out.println("abaaaabaaanbbb".substring(0, 2));;
-		System.out.println("abaaaabaaanbbb".substring(5, 7));;
+		rempExa.reemplazarCadena();
+		//Validar entrada al constructor
+		//Validar 1 o 2 o 3 o mas expresiones de la palabra
+		System.out.println("abaaaabaaanbbb".substring(2, 6));;
+		System.out.println("abaaaabaaanbbb".substring(7, 10));;
 
 	}
 }
