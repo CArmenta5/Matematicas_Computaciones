@@ -78,6 +78,7 @@ public class Reemplazador {
 		boolean flag = false;
 		boolean flagSpecialConc1 = false;
 		boolean situation = false;
+		boolean primerVuelta =false;
 		/*Limite de chequeo */
 		while(this.indexInicio < this.cadenaOriginal.length()) {
 			tries = 0;
@@ -140,6 +141,8 @@ public class Reemplazador {
 									if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
 										this.indexFinal++;
 										flag = true; //Se ha validado que exista al menos una vez
+									}else {
+										flag = false;
 									}
 									//Agregamos hasta todas la posibles
 									if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
@@ -148,25 +151,19 @@ public class Reemplazador {
 										}
 									}
 										if(pointerA < pointerC) {
-											pointerA++;//contador dentro de los ciclos de la ER
-											pointerA++;//contador dentro de los ciclos de la ER
-											pointerA++;//contador dentro de los ciclos de la ER
+											pointerA+=3;
 										
 										}
 										if(pointerB < pointerC) {
-											pointerB++;	
-											pointerB++;	
-											pointerB++;	
+											pointerB+=3;	
 
 										}
 										if(pointerC < this.arrayER[tries].length()) {
-											pointerC++;	
-											pointerC++;	
-											pointerC++;	
+											pointerC+=3;
 
 										}
 										if(pointerA<this.arrayER[tries].length()) {
-											if(this.arrayER[tries].charAt(pointerA+1)=='*') {
+											if(this.arrayER[tries].charAt(pointerA+1)=='*' ||this.arrayER[tries].charAt(pointerA-1)==this.arrayER[tries].charAt(pointerA)||this.arrayER[tries].charAt(pointerA-1)!=this.arrayER[tries].charAt(pointerA)) {
 												pointerA--;	
 												pointerB--;	
 												pointerC--;	
@@ -187,26 +184,19 @@ public class Reemplazador {
 										this.indexFinal++;
 										flag = true; //Se ha validado que exista al menos una vez
 										if(pointerA <= pointerC) {
-											pointerA++;//contador dentro de los ciclos de la ER
-											pointerA++;//contador dentro de los ciclos de la ER
-											pointerA++;//contador dentro de los ciclos de la ER
-
+											pointerA+=3;
 										}
 										if(pointerB <= pointerC) {
-											pointerB++;	
-											pointerB++;	
-											pointerB++;	
+											pointerB+=3;
 
 										}
 										if(pointerC < this.arrayER[tries].length()) {
-											pointerC++;	
-											pointerC++;	
-											pointerC++;	
+											pointerC+=3;	
 
 										
 										}
 										if(pointerA<this.arrayER[tries].length()) {
-											if(this.arrayER[tries].charAt(pointerA+1)=='*') {
+											if(this.arrayER[tries].charAt(pointerA+1)=='*'||this.arrayER[tries].charAt(pointerA+1)!=this.arrayER[tries].charAt(pointerA)) {
 												pointerA--;	
 												pointerB--;	
 												pointerC--;	
@@ -239,43 +229,38 @@ public class Reemplazador {
 
 											System.out.println("Se ha llegado a un match dentro del CASO 2.2");
 										}else {
+											
 											flag = true; //Se ha validado que exista al menos una vez
 											if(pointerA <= pointerC) {
-												pointerA++;//contador dentro de los ciclos de la ER
-												pointerA++;//contador dentro de los ciclos de la ER
-												//contador dentro de los ciclos de la ER
-
+												pointerA+=2;
 											}
 											if(pointerB <= pointerC) {
-												pointerB++;	
-												pointerB++;	
+												pointerB+=2;
 
 											}
 											if(pointerC < this.arrayER[tries].length()) {
-												pointerC++;	
-												pointerC++;	
+												pointerC+=2;
 
 											}
 											
 										}
 									}else {
-										flag = true; //Se ha validado que exista al menos una vez
-										if(pointerA <= pointerC) {
-											pointerA++;//contador dentro de los ciclos de la ER
-											pointerA++;//contador dentro de los ciclos de la ER
-											//contador dentro de los ciclos de la ER
+										if(this.arrayER[tries].charAt(pointerA+2)!=this.cadenaOriginal.charAt(this.indexFinal) ) {
+											flag = false;
+										}else {
+											flag = true; //Se ha validado que exista al menos una vez
+											if(pointerA <= pointerC) {
+												pointerA+=2;
+											}
+											if(pointerB <= pointerC) {
+												pointerB+=2;
 
-										}
-										if(pointerB <= pointerC) {
-											pointerB++;	
-											pointerB++;	
+											}
+											if(pointerC < this.arrayER[tries].length()) {
+												pointerC+=2;
 
-										}
-										if(pointerC < this.arrayER[tries].length()) {
-											pointerC++;	
-											pointerC++;	
+											}
 
-										
 										}
 									} 			   
 								}else {
@@ -316,10 +301,19 @@ public class Reemplazador {
 									}else {
 										if(flag) {
 											if(pointerA+1<this.arrayER[tries].length()) {
-												if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)=='*') {
+												if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)=='*' && !(pointerA<this.arrayER[tries].length())) {
 													flag=true;	
 													situation = true;
-												}	
+												}else if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)!='*'){
+													flag=true;	
+
+												}else if(pointerC == this.arrayER[tries].length() && flag && pointerA+2 ==pointerC && primerVuelta) {
+													situation = true;
+
+												}
+												if(!primerVuelta && this.arrayER[tries].length() ==pointerC && this.arrayER[tries].length() > pointerA) {
+													primerVuelta = true;
+												}
 											}else {
 												if(this.arrayER[tries].charAt(pointerA+1)=='*') {
 													flag = true;
@@ -353,7 +347,9 @@ public class Reemplazador {
 											pointerC++;	
 										}
 										if(pointerA+3>=this.arrayER[tries].length()) {
-											break;
+											if(pointerA+3==pointerC) {
+												break;
+											}
 										}
 										System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 
@@ -366,7 +362,7 @@ public class Reemplazador {
 
 								}
 								// CASO 3.2: Sí existe a*
-								if(this.cadenaOriginal.length()!=this.indexFinal) {
+								if(this.cadenaOriginal.length()!=this.indexFinal && flag) {
 									while(this.arrayER[tries].charAt(pointerA) == this.cadenaOriginal.charAt(this.indexFinal) ) {
 										this.indexFinal++;
 										flag = true; //Se ha validado que exista al menos una vez
@@ -429,10 +425,10 @@ public class Reemplazador {
 							pointerC++;	
 						}
 					}
-					if(flag == true && (this.cadenaOriginal.length() == this.indexFinal && pointerA!=pointerC) || flag == false) {
+					if(flag == true && (this.cadenaOriginal.length() == this.indexFinal && pointerA!=pointerC) ) {
 						//Todos son asteriscos
 						boolean demente=false;
-						while(pointerA<this.arrayER[tries].length()) {
+						while(pointerA+1<this.arrayER[tries].length()) {
 							if(this.arrayER[tries].charAt(pointerA+1)=='*') {
 								pointerA+=2;
 							}else {
@@ -447,9 +443,14 @@ public class Reemplazador {
 							flag = false;
 							break;
 						}
+					}if(flag == false) {
+						System.out.println("No se ha llegado a un match");
+						flag = false;
+						break;
 					}
 					if(pointerA == pointerC) {
 						flag = true; //Se ha validado que exista al menos una vez
+						//situation =true;
 					}	
 				}
 				/********/
@@ -495,11 +496,17 @@ public class Reemplazador {
 		}
 	}
 	public static void main(String[] args) {
-		Reemplazador rempExa = new Reemplazador("abaab aab aaanbbb", "a*aba*b*","ccc");
+		//Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "aba","ccc");
+		//Porblema de estrella con concatenacion
+		//Cualquier tipo de concatenación sola jala
+		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*aba*+bbb*","ccc");
+
+//		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*ab*","ccc");//cccccc ccc cccnbbb
+//		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*b","ccc");//Sí
+
 		rempExa.replacer();
 		rempExa.useSwap();
-		System.out.println("abaaaabaaanbbb”".substring(3,7));
-		System.out.println("aaanbbb".substring(0,3));
+	
 
 		//Validar entrada al constructor
 		
