@@ -6,7 +6,7 @@ public class Reemplazador {
 					cadenaReemplazadora,
 					resultado;
 	private String[] arrayER;
-	private ArrayList<Integer> indexAReemplazar ;
+	private ArrayList<Integer> indexAL ;
 	private int indexInicio,
 				indexFinal;	
 	
@@ -15,13 +15,12 @@ public class Reemplazador {
 		this.patronER = patronER;
 		this.cadenaReemplazadora = cadenaReemplazadora;
 		this.indexInicio = this.indexFinal = 0;
-		int cantUnion = contadorCoincidencias(patronER);
-		this.arrayER = new String[cantUnion + 1];
-		indexAReemplazar = new ArrayList<Integer>();
-		fillArray();	
+		this.arrayER = new String[countMatches(patronER) + 1];
+		this.indexAL = new ArrayList<Integer>();
+		fillArrayER();	
 	}
 	
-	public void fillArray() {
+	public void fillArrayER() {
 		int cont = 0;
 		int cont2 = 0;
 		String cadena="";
@@ -39,7 +38,7 @@ public class Reemplazador {
 	}
 	
 	//Checa las ocurrencias dentro de una palabra
-	public int contadorCoincidencias(String cadena) {
+	public int countMatches(String cadena) {
 		if(cadena.length() == 1){
 			if(cadena.equals("+")){
 				return 1;
@@ -48,32 +47,31 @@ public class Reemplazador {
 			}
 		}else {
 			if(cadena.charAt(0)  == '+') {
-				return contadorCoincidencias(cadena.substring(1)) + 1;
+				return countMatches(cadena.substring(1)) + 1;
 			}else {
-				return contadorCoincidencias(cadena.substring(1));	
+				return countMatches(cadena.substring(1));	
 			}
 		}
 	}
-	public void indexCadenasRemplazar(int indexIn, int indexFi) {
-		String inicioCadena =this.resultado.substring(0, indexIn);
-		String finalCadena =this.resultado.substring(indexFi,this.resultado.length());
-		this.resultado =inicioCadena+this.cadenaReemplazadora+finalCadena;
-	}
-	public void reemplazarCadena() {
-		for(int i = this.indexAReemplazar.size()-1; i >0 ; i=i-2) {
-			indexCadenasRemplazar(this.indexAReemplazar.get(i-1),this.indexAReemplazar.get(i) );
-			
+
+	public void useSwap() {
+		String cadenaIzq, cadenaDer;
+		for(int i = this.indexAL.size()-1; i >0 ; i=i-2) {
+			cadenaIzq =this.resultado.substring(0, this.indexAL.get(i-1));
+			cadenaDer =this.resultado.substring(this.indexAL.get(i),this.resultado.length());
+			this.resultado =cadenaIzq+this.cadenaReemplazadora+cadenaDer;
 		}
 		System.out.println(this.resultado);
 	}
 	
-	public void reemplazador() {
+	public void replacer() {
 		int i, j, tries;
 		int pointerA, // Pointer dentro de la ER, es el simbolo actual que se estará checando
 			pointerB, // Pointer delante del PointerA el cual nos avisa cuál será la operación a seguir si es CERRRADURA DE KLEENE o CONCATENACIÓN
 			pointerC; // Pointer que nos avisa el fin de la ER
 		this.indexInicio = this.indexFinal = i = j = tries= pointerA = pointerB = pointerC = 0;
 		boolean flag = false;
+		boolean flagSpecialConc1 = false;
 		/*Limite de chequeo */
 		while(this.indexInicio < this.cadenaOriginal.length()) {
 			tries = 0;
@@ -110,10 +108,8 @@ public class Reemplazador {
 					pointerC = 2;
 				}
 				
-				while(pointerA < this.arrayER[tries].length() && this.indexFinal <this.cadenaOriginal.length()  && flag) {	
-					
-				
-					
+				while(pointerA < this.arrayER[tries].length() && this.indexFinal <this.cadenaOriginal.length()  && flag && !flagSpecialConc1) {	
+	
 					// Se valida que c llegue hasta al final y que a agregue hasta el ultimo elemento posible
 					
 					if(pointerC <= this.arrayER[tries].length() && pointerA <= pointerC) {
@@ -121,7 +117,7 @@ public class Reemplazador {
 						System.out.println(this.cadenaOriginal.charAt(this.indexFinal)+"-"+this.arrayER[tries].charAt(pointerA));
 						
 						//checo que la derecha del simbolo se encuentre esta operación
-						if(pointerB==pointerC) {
+						if(pointerB==pointerC && this.arrayER[tries].length() != 2) {
 							pointerB = pointerA;
 						}
 						
@@ -205,8 +201,15 @@ public class Reemplazador {
 							 if(!extraFlag) {
 								  // CASO 3.1: Producto de la palabra vacía
 								  if(this.arrayER[tries].charAt(pointerA) != this.cadenaOriginal.charAt(this.indexFinal)) {
-									flag = true; //Se ha validado que exista al menos una vez
-											
+									  //Aunque se vea tonto este valida si tomaremos en cuenta la palabra vacia o no
+									  if(flag){
+										  flag =true;
+									  }else{
+										  this.indexFinal++;
+										  flag = false;  
+									  }
+									   //A pesar de que esta se encuentre en todas partes, se tiene que validar.
+
 									
 									  if(pointerA <= pointerC) {
 											pointerA++;//contador dentro de los ciclos de la ER
@@ -220,32 +223,59 @@ public class Reemplazador {
 									  System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 								  }
 								  // CASO 3.2: Sí existe a*
-								  while(this.arrayER[tries].charAt(pointerA) == this.cadenaOriginal.charAt(this.indexFinal) ) {
-									  this.indexFinal++;
-			     						flag = true; //Se ha validado que exista al menos una vez
-			     						if(pointerA <= pointerC) {
-											pointerA++;//contador dentro de los ciclos de la ER
-										}
-										if(pointerB <= pointerC) {
-											pointerB++;	
-										}
-										if(pointerC < this.arrayER[tries].length()) {
-											pointerC++;	
-										}
-									  System.out.println("Se ha llegado a un match dentro del CASO 3.1");
-								  }
+								 if(this.cadenaOriginal.length()!=this.indexFinal) {
+									 while(this.arrayER[tries].charAt(pointerA) == this.cadenaOriginal.charAt(this.indexFinal) ) {
+										  this.indexFinal++;
+				     						flag = true; //Se ha validado que exista al menos una vez
+				     						
+										  System.out.println("Se ha llegado a un match dentro del CASO 3.2");
+										  if(this.cadenaOriginal.length()==this.indexFinal) {
+											  
+											  break;
+										  }
+									  }
+								 }//CASO 3.3
+								 else {
+									  System.out.println("Se ha llegado a un match dentro del CASO 3.2");
+
+								 }
+								 if(pointerA <= pointerC) {
+										pointerA++;//contador dentro de los ciclos de la ER
+									}
+									if(pointerB <= pointerC) {
+										pointerB++;	
+									}
+									if(pointerC < this.arrayER[tries].length()) {
+										pointerC++;	
+									}
 							  }
 							
 						}else {
 							// CONCATENACIÓN
-							if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA) ) {
-								this.indexFinal++;
-									flag = true; //Se ha validado que exista al menos una vez
-									
-									System.out.println("Se ha llegado a un match de concatenación");
-							}else {
-								flag = false;
-							}	
+							//CASO 1: Solo existe un simbolo dentro de la ER
+							if(this.arrayER[tries].length()==1) {
+								if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA) ) {
+									this.indexFinal++;
+										flag = true; //Se ha validado que exista al menos una vez
+										flagSpecialConc1 = true;
+										System.out.println("Se ha llegado a un match de concatenación del CASO 1");
+								}else {
+									flag = false;
+									flagSpecialConc1 = false;
+
+								}	
+							}//CASO 2: Existen más de dos simbolos en la ER
+							else {
+								if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA) ) {
+									this.indexFinal++;
+										flag = true; //Se ha validado que exista al menos una vez
+										
+										System.out.println("Se ha llegado a un match de concatenación CASO 2");
+								}else {
+									flag = false;
+								}	
+							}
+							
 							
 						
 						}
@@ -261,7 +291,7 @@ public class Reemplazador {
 						
 					}
 					
-					if(flag == true && this.cadenaOriginal.length() == this.indexFinal || flag == false) {
+					if(flag == true && this.cadenaOriginal.length() == this.indexFinal && (pointerA!=pointerC) || flag == false) {
 						System.out.println("No se ha llegado a un match");
 						flag = false;
 						break;
@@ -277,10 +307,12 @@ public class Reemplazador {
 
 				if(this.indexFinal != this.indexInicio && flag ==true) {
 					//hacer el cambio en la copia 
-					this.indexAReemplazar.add(this.indexInicio);
-					this.indexAReemplazar.add(this.indexFinal);
+					this.indexAL.add(this.indexInicio);
+					this.indexAL.add(this.indexFinal);
 					System.out.println("Inicio: "+this.indexInicio+" Final: "+this.indexFinal);
 					this.indexInicio = this.indexFinal ;
+					flagSpecialConc1 = false;
+
 					//this.indexFinal++;
 				}
 				if(flag == true) {
@@ -297,13 +329,13 @@ public class Reemplazador {
 		
 	}
 	public static void main(String[] args) {
-		Reemplazador rempExa = new Reemplazador("abaaaabaaanbbb", "aab*a*","ccc");
-		rempExa.reemplazador();
-		rempExa.reemplazarCadena();
+		Reemplazador rempExa = new Reemplazador("abaaaabaaanbbb", "aba*+bbb*","ccc");
+		rempExa.replacer();
+		rempExa.useSwap();
 		//Validar entrada al constructor
 		//Validar 1 o 2 o 3 o mas expresiones de la palabra
-		System.out.println("abaaaabaaanbbb".substring(2, 6));;
-		System.out.println("abaaaabaaanbbb".substring(7, 10));;
+		System.out.println("abaa aab aaanbbb".substring(0, 4));;
+		System.out.println("abaa aab aaanbbb".substring(6, 8));;
 
 	}
 }
