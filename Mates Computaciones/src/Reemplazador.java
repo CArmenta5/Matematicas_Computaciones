@@ -23,9 +23,8 @@ public class Reemplazador {
 			this.arrayER = new String[0];
 		}
 	}
-
+	//Rellena el array de las parte de la ER
 	public void fillArrayER() {
-
 		int cont = 0;
 		int cont2 = 0;
 		String cadena="";
@@ -58,27 +57,27 @@ public class Reemplazador {
 			}
 		}
 	}
-
-	public void useSwap() {
-		String cadenaIzq, cadenaDer;
+	//Hace el intercambio dentro de los index de final a inicio para no preocuparnos de calculos e imprime el resultado
+	public String useSwap() {
+		String left, right;
 		for(int i = this.indexAL.size()-1; i >0 ; i=i-2) {
-			cadenaIzq =this.resultado.substring(0, this.indexAL.get(i-1));
-			cadenaDer =this.resultado.substring(this.indexAL.get(i),this.resultado.length());
-			this.resultado =cadenaIzq+this.cadenaReemplazadora+cadenaDer;
+			left =this.resultado.substring(0, this.indexAL.get(i-1));
+			right =this.resultado.substring(this.indexAL.get(i),this.resultado.length());
+			this.resultado =left+this.cadenaReemplazadora+right;
 		}
-		System.out.println(this.resultado);
+		return this.resultado;
 	}
-
+	//Método que consigue los indices de las coincidencias dentro de la cadena original
 	public void replacer() {
 		int i, j, tries;
 		int pointerA, // Pointer dentro de la ER, es el simbolo actual que se estará checando
 		pointerB, // Pointer delante del PointerA el cual nos avisa cuál será la operación a seguir si es CERRRADURA DE KLEENE o CONCATENACIÓN
-		pointerC; // Pointer que nos avisa el fin de la ER
+		pointerC; // Pointer delante del PointerB que nos avisa el fin de la ER
 		this.indexInicio = this.indexFinal = i = j = tries= pointerA = pointerB = pointerC = 0;
-		boolean flag = false;
-		boolean flagSpecialConc1 = false;
-		boolean situation = false;
-		boolean primerVuelta =false;
+		boolean flag = false; //Una expresión es correcta
+		boolean flagSpecialConc1 = false; //Caso especial dentro de concatenación
+		boolean situation = false; //La ER ya acabó y es igual a cadena vacía
+		boolean primerVuelta =false; //Realiza dos vueltas dentro de la ER
 		/*Limite de chequeo */
 		while(this.indexInicio < this.cadenaOriginal.length()) {
 			tries = 0;
@@ -132,154 +131,137 @@ public class Reemplazador {
 							// CERRADURA DE  KLEENE
 							boolean extraFlag =false; //Checa que si haya otra estrella
 							//Verificamos que no nos pasemos
-							
-							if(pointerA+2 < this.arrayER[tries].length() && pointerA+3 < this.arrayER[tries].length() ) {
-								
-								// CASO 1: Elemento igual a la derecha (a*a) -> a/aa/aaa/aaa...a en donde no la 2da a no es cerradura manda a hacer bandera especial
-								if(this.arrayER[tries].charAt(pointerA) == this.arrayER[tries].charAt(pointerA+2) && this.arrayER[tries].charAt(pointerA+3) != '*') {
-									//validar al menos exista una a
-									if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
-										this.indexFinal++;
-										flag = true; //Se ha validado que exista al menos una vez
-									}else {
-										flag = false;
-									}
-									//Agregamos hasta todas la posibles
-									if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
-										while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+							//PointerA->a PointerB->* PointerC->x o |
+							//PointerA->a PointerB->* PointerC->x o | PointerA+3 ->*
+							//Primera condicion posible si jala 
+							if(pointerA+2 < this.arrayER[tries].length() || pointerA+3 < this.arrayER[tries].length() ) {
+								//Checa si no nos hemos pasamos del limite
+								if(pointerA+3<this.arrayER[tries].length()) {
+									//Caso de que pointerA+3 sea *
+									if(this.arrayER[tries].charAt(pointerA+3)=='*') {
+										//tenemos el caso a*x*
+										extraFlag = true;
+									}//sí no entra será concatenación
+									
+								}else {
+									//caso donde a*x
+									// CASO 1: Elemento igual a la derecha (a*a) -> a/aa/aaa/aaa...a en donde no la 2da a no es cerradura manda a hacer bandera especial
+									if(this.arrayER[tries].charAt(pointerA) == this.arrayER[tries].charAt(pointerA+2) ) {
+										//validar al menos exista una a
+										if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
 											this.indexFinal++;
+											flag = true; //Se ha validado que exista al menos una vez
+										}else {
+											flag = false;
 										}
-									}
+										//Agregamos hasta todas la posibles
+										if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+											while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+												this.indexFinal++;
+												if(this.indexFinal >= this.cadenaOriginal.length()) {
+													break;
+												}
+											}
+										}
+										
 										if(pointerA < pointerC) {
 											pointerA+=3;
-										
 										}
 										if(pointerB < pointerC) {
 											pointerB+=3;	
-
 										}
 										if(pointerC < this.arrayER[tries].length()) {
 											pointerC+=3;
-
 										}
 										if(pointerA<this.arrayER[tries].length()) {
 											if(this.arrayER[tries].charAt(pointerA+1)=='*' ||this.arrayER[tries].charAt(pointerA-1)==this.arrayER[tries].charAt(pointerA)||this.arrayER[tries].charAt(pointerA-1)!=this.arrayER[tries].charAt(pointerA)) {
 												pointerA--;	
 												pointerB--;	
-												pointerC--;	
-												
+												pointerC--;													
 											}
 										}
-									
-									
-									if(flag) {
-										System.out.println("Se ha llegado a un match dentro del CASO 1");
-									}
-								}							
-								//CASO 2: Elemento diferente a la derecha (a*b) -> b/ab/aab/aaa...b en donde no la 2da a no es cerradura manda a hacer bandera especial
-								else if(this.arrayER[tries].charAt(pointerA) != this.arrayER[tries].charAt(pointerA+2) && this.arrayER[tries].charAt(pointerA+3) != '*') {
-									//Si existe podemos dejarle el trabajo a la concatenación para que continue...
-									//CASO 2.1: No existe a*, pero sí b
-									if(this.arrayER[tries].charAt(pointerC) == this.cadenaOriginal.charAt(this.indexFinal)) {
-										this.indexFinal++;
-										flag = true; //Se ha validado que exista al menos una vez
-										if(pointerA <= pointerC) {
-											pointerA+=3;
+										if(flag) {
+											System.out.println("Se ha llegado a un match dentro del CASO 1");
 										}
-										if(pointerB <= pointerC) {
-											pointerB+=3;
-
-										}
-										if(pointerC < this.arrayER[tries].length()) {
-											pointerC+=3;	
-
-										
-										}
-										if(pointerA<this.arrayER[tries].length()) {
-											if(this.arrayER[tries].charAt(pointerA+1)=='*'||this.arrayER[tries].charAt(pointerA+1)!=this.arrayER[tries].charAt(pointerA)) {
-												pointerA--;	
-												pointerB--;	
-												pointerC--;	
-												
-											}
-										}
-										System.out.println("Se ha llegado a un match dentro del CASO 2.1");
-									}
-									//CASO 2.2: Sí existe a*b
-									else if(this.arrayER[tries].charAt(pointerA) == this.cadenaOriginal.charAt(this.indexFinal)) {
-										this.indexFinal++;
-										
-										while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+									}							
+									//CASO 2: Elemento diferente a la derecha (a*b) -> b/ab/aab/aaa...b en donde no la 2da a no es cerradura manda a hacer bandera especial
+									else if(this.arrayER[tries].charAt(pointerA) != this.arrayER[tries].charAt(pointerA+2)) {
+										//Si existe podemos dejarle el trabajo a la concatenación para que continue...
+										//CASO 2.1: No existe a*, pero sí b
+										//Apuntamos a *
+										//si hay un chingo o al menos uno
+										if(this.arrayER[tries].charAt(pointerA) == this.cadenaOriginal.charAt(this.indexFinal)) {											
 											this.indexFinal++;
-										}
-										if(this.cadenaOriginal.charAt(this.indexFinal)==this.arrayER[tries].charAt(pointerC)) {
 											flag = true; //Se ha validado que exista al menos una vez
-											if(pointerA <= pointerC) {
-												pointerA++;//contador dentro de los ciclos de la ER
+											if(this.indexFinal< this.cadenaOriginal.length()) {
+												while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+													this.indexFinal++;
+													if(this.indexFinal >= this.cadenaOriginal.length()-1) {
+														break;
+													}
+												}
+											}else {
+												flag = false;
 											}
-											if(pointerB <= pointerC) {
-												pointerB++;	
-										
-											}
-											if(pointerC < this.arrayER[tries].length()) {
-												pointerC++;	
 											
 											
-											}
-
-											System.out.println("Se ha llegado a un match dentro del CASO 2.2");
-										}else {
 											
-											flag = true; //Se ha validado que exista al menos una vez
-											if(pointerA <= pointerC) {
-												pointerA+=2;
-											}
-											if(pointerB <= pointerC) {
-												pointerB+=2;
-
-											}
-											if(pointerC < this.arrayER[tries].length()) {
-												pointerC+=2;
-
-											}
+										}//si es null 
+										else if(this.arrayER[tries].charAt(pointerA) != this.cadenaOriginal.charAt(this.indexFinal)) {
+											flag = true;
 											
 										}
-									}else {
-										if(this.arrayER[tries].charAt(pointerA+2)!=this.cadenaOriginal.charAt(this.indexFinal) ) {
-											flag = false;
-										}else {
-											flag = true; //Se ha validado que exista al menos una vez
-											if(pointerA <= pointerC) {
-												pointerA+=2;
-											}
-											if(pointerB <= pointerC) {
-												pointerB+=2;
+										if(flag){
+											//Se evaluó a*, pero no aún b
+											if(this.indexFinal>=this.cadenaOriginal.length()) {
+												flag = false;
+											}else if(this.arrayER[tries].charAt(pointerA+2) == this.cadenaOriginal.charAt(this.indexFinal)) {
+												this.indexFinal++;
 
+												flag =true;
+												if(pointerA < pointerC) {
+													//if(pointerA+3 < this.arrayER[tries].length()-1 && !(pointerA+3 >= this.arrayER[tries].length())) {
+													pointerA+=3;															
+												}
+												if(pointerB < pointerC) {
+													pointerB+=3;
+												}
+												if(pointerC < this.arrayER[tries].length()) {
+													pointerC+=3;
+												}
+												
+											}else {
+												flag = false;
+												if(pointerA <= pointerC) {
+													pointerA+=2;//contador dentro de los ciclos de la ER
+												}
+												if(pointerB <= pointerC) {
+													pointerB+=2;	
+												}
+												if(pointerC < this.arrayER[tries].length()) {
+													pointerC+=2;	
+												}
 											}
-											if(pointerC < this.arrayER[tries].length()) {
-												pointerC+=2;
-
-											}
-
-										}
-									} 			   
-								}else {
-									extraFlag = true;
+										}				   
 									}
+								
+								}
+							}else {
+								extraFlag =true;
 							}
-							if(pointerA != pointerC && !(pointerA+2 < this.arrayER[tries].length() && pointerA+3 < this.arrayER[tries].length())) {
+/*							if(pointerA != pointerC && !(pointerA+2 < this.arrayER[tries].length() && pointerA+3 < this.arrayER[tries].length())) {
 								extraFlag = true;
 							}
-							//Caso 3: Cerradura de kleene individual
+	*/						//Caso 3: Cerradura de kleene individual
 							if(extraFlag) {
 								// CASO 3.1: Producto de la palabra vacía
 								if(this.arrayER[tries].charAt(pointerA) != this.cadenaOriginal.charAt(this.indexFinal)) {
 									//Aunque se vea tonto este valida si tomaremos en cuenta la palabra vacia o no
-									if(pointerA+3 <this.arrayER[tries].length()) {
-										if( this.arrayER[tries].charAt(pointerA+3) == '*') {
+									if(pointerA+3 <this.arrayER[tries].length() ) {
+										if( this.arrayER[tries].charAt(pointerA+3) == '*' ) {
 											if(flag){
 												flag = true;
-												
+
 											}else{
 												flag = false;  
 												if(pointerA <= pointerC) {
@@ -295,25 +277,47 @@ public class Reemplazador {
 													break;
 												}
 											}
-										
+
 											System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 										}
 									}else {
 										if(flag) {
 											if(pointerA+1<this.arrayER[tries].length()) {
-												if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)=='*' && !(pointerA<this.arrayER[tries].length())) {
+												if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)=='*' && (!(pointerA<this.arrayER[tries].length())||this.arrayER[tries].length()==2)) {
 													flag=true;	
 													situation = true;
 												}else if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)!='*'){
 													flag=true;	
 
-												}else if(pointerC == this.arrayER[tries].length() && flag && pointerA+2 ==pointerC && primerVuelta) {
+												}else 	if(this.arrayER[tries].charAt(pointerA+1)=='*') {
+													flag = true;
+													if(pointerA <= pointerC) {
+														pointerA++;//contador dentro de los ciclos de la ER
+													}
+													if(pointerB <= pointerC) {
+														pointerB++;	
+													}
+													if(pointerC < this.arrayER[tries].length()) {
+														pointerC++;	
+													}
+													if(pointerA+3>=this.arrayER[tries].length()) {
+														if(pointerA==this.arrayER[tries].length()-1) {
+															situation = true;
+														}
+														break;
+													}
+												}else if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal)) {
+													flag=false;	
+
+												}
+												else if(pointerC == this.arrayER[tries].length() && flag && pointerA+2 ==pointerC && primerVuelta) {
 													situation = true;
 
 												}
 												if(!primerVuelta && this.arrayER[tries].length() ==pointerC && this.arrayER[tries].length() > pointerA) {
 													primerVuelta = true;
 												}
+												
 											}else {
 												if(this.arrayER[tries].charAt(pointerA+1)=='*') {
 													flag = true;
@@ -327,15 +331,15 @@ public class Reemplazador {
 														pointerC++;	
 													}
 													if(pointerA+3>=this.arrayER[tries].length()) {
-														
+
 														break;
 													}
 												}else if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal)) {
 													flag=false;	
-					
+
 												}	
 											}
-																		
+
 										}
 										if(pointerA <= pointerC) {
 											pointerA++;//contador dentro de los ciclos de la ER
@@ -354,12 +358,7 @@ public class Reemplazador {
 										System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 
 									}
-
-									
 									//A pesar de que esta se encuentre en todas partes, se tiene que validar.
-
-
-
 								}
 								// CASO 3.2: Sí existe a*
 								if(this.cadenaOriginal.length()!=this.indexFinal && flag) {
@@ -425,6 +424,9 @@ public class Reemplazador {
 							pointerC++;	
 						}
 					}
+					if(flag == true && this.arrayER[tries].length() <= pointerA && this.indexFinal!=this.indexInicio) {
+						break;
+					}
 					if(flag == true && (this.cadenaOriginal.length() == this.indexFinal && pointerA!=pointerC) ) {
 						//Todos son asteriscos
 						boolean demente=false;
@@ -455,7 +457,8 @@ public class Reemplazador {
 				}
 				/********/
 				pointerA = 0;
-
+				
+				
 				if(this.indexFinal != this.indexInicio && flag ==true) {
 					//hacer el cambio en la copia 
 					this.indexAL.add(this.indexInicio);
@@ -467,17 +470,14 @@ public class Reemplazador {
 						situation=false;
 					}else {
 						this.indexInicio = this.indexFinal ;
-
 					}
 					flagSpecialConc1 = false;
 					//this.indexFinal++;
 				}else if(this.indexFinal == this.indexInicio && flag ==true) {
-					
 					if(situation) {
 						this.indexInicio = this.indexFinal=this.indexFinal+1;
 						situation=false;
 						flagSpecialConc1 = false;
-
 					}
 				}
 				if(flag == true) {
@@ -496,19 +496,8 @@ public class Reemplazador {
 		}
 	}
 	public static void main(String[] args) {
-		//Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "aba","ccc");
-		//Porblema de estrella con concatenacion
-		//Cualquier tipo de concatenación sola jala
-		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*aba*+bbb*","ccc");
-
-//		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*ab*","ccc");//cccccc ccc cccnbbb
-//		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*b","ccc");//Sí
-
+		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*","ccc");
 		rempExa.replacer();
-		rempExa.useSwap();
-	
-
-		//Validar entrada al constructor
-		
+		System.out.println(rempExa.useSwap());
 	}
 }
