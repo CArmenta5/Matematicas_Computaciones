@@ -78,6 +78,7 @@ public class Reemplazador {
 		boolean flagSpecialConc1 = false; //Caso especial dentro de concatenación
 		boolean situation = false; //La ER ya acabó y es igual a cadena vacía
 		boolean primerVuelta =false; //Realiza dos vueltas dentro de la ER
+		boolean tor=false;
 		/*Limite de chequeo */
 		while(this.indexInicio < this.cadenaOriginal.length()) {
 			tries = 0;
@@ -143,7 +144,7 @@ public class Reemplazador {
 										extraFlag = true;
 									}//sí no entra será concatenación
 									
-								}else {
+								} if(extraFlag==false && pointerA+2 < this.arrayER[tries].length()) {
 									//caso donde a*x
 									// CASO 1: Elemento igual a la derecha (a*a) -> a/aa/aaa/aaa...a en donde no la 2da a no es cerradura manda a hacer bandera especial
 									if(this.arrayER[tries].charAt(pointerA) == this.arrayER[tries].charAt(pointerA+2) ) {
@@ -154,12 +155,16 @@ public class Reemplazador {
 										}else {
 											flag = false;
 										}
-										//Agregamos hasta todas la posibles
-										if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
-											while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
-												this.indexFinal++;
-												if(this.indexFinal >= this.cadenaOriginal.length()) {
-													break;
+										
+										if(this.indexFinal< this.cadenaOriginal.length()-1 && flag) {											
+											flag =true;
+											//Agregamos hasta todas la posibles
+											if(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+												while(this.cadenaOriginal.charAt(this.indexFinal) == this.arrayER[tries].charAt(pointerA)) {
+													this.indexFinal++;
+													if(this.indexFinal >= this.cadenaOriginal.length()) {
+														break;
+													}
 												}
 											}
 										}
@@ -221,13 +226,13 @@ public class Reemplazador {
 												flag =true;
 												if(pointerA < pointerC) {
 													//if(pointerA+3 < this.arrayER[tries].length()-1 && !(pointerA+3 >= this.arrayER[tries].length())) {
-													pointerA+=3;															
+													pointerA+=2;															
 												}
 												if(pointerB < pointerC) {
-													pointerB+=3;
+													pointerB+=2;
 												}
 												if(pointerC < this.arrayER[tries].length()) {
-													pointerC+=3;
+													pointerC+=2;
 												}
 												
 											}else {
@@ -289,7 +294,8 @@ public class Reemplazador {
 												}else if(this.arrayER[tries].charAt(pointerA)!=this.cadenaOriginal.charAt(this.indexFinal) && this.arrayER[tries].charAt(pointerA+1)!='*'){
 													flag=true;	
 
-												}else 	if(this.arrayER[tries].charAt(pointerA+1)=='*') {
+												}
+												else if(this.arrayER[tries].charAt(pointerA+1)=='*') {
 													flag = true;
 													if(pointerA <= pointerC) {
 														pointerA++;//contador dentro de los ciclos de la ER
@@ -303,6 +309,11 @@ public class Reemplazador {
 													if(pointerA+3>=this.arrayER[tries].length()) {
 														if(pointerA==this.arrayER[tries].length()-1) {
 															situation = true;
+															
+															if(this.indexFinal<=this.cadenaOriginal.length()-1 && !primerVuelta) {
+																situation = false;
+																tor =true;
+															}
 														}
 														break;
 													}
@@ -427,9 +438,9 @@ public class Reemplazador {
 					if(flag == true && this.arrayER[tries].length() <= pointerA && this.indexFinal!=this.indexInicio) {
 						break;
 					}
-					if(flag == true && (this.cadenaOriginal.length() == this.indexFinal && pointerA!=pointerC) ) {
+					if(flag == true && (this.cadenaOriginal.length() == this.indexFinal && pointerA!=pointerC && !tor) ) {
 						//Todos son asteriscos
-						boolean demente=false;
+						 tor=false;
 						while(pointerA+1<this.arrayER[tries].length()) {
 							if(this.arrayER[tries].charAt(pointerA+1)=='*') {
 								pointerA+=2;
@@ -496,7 +507,7 @@ public class Reemplazador {
 		}
 	}
 	public static void main(String[] args) {
-		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "a*","ccc");
+		Reemplazador rempExa = new Reemplazador("abaa aab aaanbbb", "b*ab*","ccc");
 		rempExa.replacer();
 		System.out.println(rempExa.useSwap());
 	}
