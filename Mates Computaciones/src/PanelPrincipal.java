@@ -26,7 +26,6 @@ public class PanelPrincipal extends JPanel implements ActionListener{
 		super();
 		this.setLayout(null);
 		
-		//this.setBackground(new Color(Integer.parseInt("F9AC67",  16 )));
 		this.jlCadenaOriginal  = new JLabel();
 		this.jlPatronER  = new JLabel();
 		this.jlCadenaReemplazadora  = new JLabel();
@@ -45,8 +44,8 @@ public class PanelPrincipal extends JPanel implements ActionListener{
 		this.jlTitulo.setText("Reemplazador con expresiones regulares");
 		this.jlCadenaOriginal.setText("Cadena original:");
 
-		this.jlPatronER.setText("Patrón de entrada:");
-		this.jlCadenaReemplazadora.setText("Cadena original:");
+		this.jlPatronER.setText("Patron de entrada:");
+		this.jlCadenaReemplazadora.setText("Cadena reemplazadora:");
 		this.jlSalida.setText("Salida:");
 		this.setPreferredSize(new Dimension(600,400));
 		
@@ -64,7 +63,7 @@ public class PanelPrincipal extends JPanel implements ActionListener{
 		this.jlTitulo.setBounds(50, 10, 4000, 60);
 		this.jlCadenaOriginal.setBounds(225, 70, 150, 25);
 		this.jlPatronER.setBounds(225, 130, 150, 25);
-		this.jlCadenaReemplazadora.setBounds(225, 190, 150, 25);
+		this.jlCadenaReemplazadora.setBounds(210, 190, 180, 25);
 		this.jlSalida.setBounds(260, 250, 75, 25);
 		
 		this.tfCadenaOriginal.setBounds(100, 100, 400, 25);
@@ -95,24 +94,26 @@ public class PanelPrincipal extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent evt) {
 		String cadenaOriginal, 
 		patronER, 
-		cadenaReemplazadora,
-		salida;
-		cadenaOriginal=	patronER=cadenaReemplazadora=salida="";
+		cadenaReemplazadora;
+		cadenaOriginal=	patronER=cadenaReemplazadora="";
 		
 		boolean flag=true; 
 		if((this.tfCadenaOriginal.getText().equals(""))) {
 			flag = false;
+			JOptionPane.showMessageDialog(null,"La cadena original esta vacia");
+
 		}else {
 			cadenaOriginal = this.tfCadenaOriginal.getText();
 
 		}
-		if((this.tfPatronER.getText().equals("")) && this.tfPatronER.getText() == null) {
-			JOptionPane.showMessageDialog(null,"El patrón a reemplazar no puede quedar vacío");
+		if((this.tfPatronER.getText().equals("")) || this.tfPatronER.getText() == null) {
+			JOptionPane.showMessageDialog(null,"La cadena reemplazadora no puede ser de longitud 0 (cadena vacia)");
+			
 			flag = false;
 		}else {
 			patronER = this.tfPatronER.getText();
 		}
-		if(this.tfCadenaReemplazadora.getText() == null && this.tfCadenaReemplazadora.getText().length()==0) {
+		if(this.tfCadenaReemplazadora.getText() == null || this.tfCadenaReemplazadora.getText().length()==0) {
 			if(this.tfCadenaReemplazadora.getText().equals("")) {
 				cadenaReemplazadora = this.tfCadenaReemplazadora.getText();
 			}else {
@@ -124,12 +125,14 @@ public class PanelPrincipal extends JPanel implements ActionListener{
 			cadenaReemplazadora = this.tfCadenaReemplazadora.getText();
 		}
 		if(flag  == true) {
-			JOptionPane.showMessageDialog(null,"Se logró con exito");
+			JOptionPane.showMessageDialog(null,"Se logro con exito");
 
 			Reemplazador reemplazador = new Reemplazador(cadenaOriginal,patronER,cadenaReemplazadora);
 			reemplazador.replacer();
 			this.tfSalida.setText(reemplazador.useSwap());
-		}		
+		}else {
+			
+		}	
 					
 	}
 	

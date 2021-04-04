@@ -1,6 +1,7 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
-public class Reemplazador {
+public class ReemplazacorCon {
 	private String cadenaOriginal ,
 	patronER,
 	cadenaReemplazadora,
@@ -10,18 +11,56 @@ public class Reemplazador {
 	private int indexInicio,
 	indexFinal;	
 
-	public Reemplazador(String cadenaOriginal, String patronER, String cadenaReemplazadora) {
-		this.cadenaOriginal = this.resultado= cadenaOriginal;
-		this.patronER = patronER;
-		this.cadenaReemplazadora = cadenaReemplazadora;
-		this.indexInicio = this.indexFinal = 0;
-		this.indexAL = new ArrayList<Integer>();
-		if(!this.patronER.equals("")) {
-			this.arrayER = new String[countMatches(patronER) + 1];
-			fillArrayER();	
-		}else {
-			this.arrayER = new String[0];
-		}
+	public ReemplazacorCon() {
+		String respuesta;	
+		
+		do {
+			boolean on = true;
+			Scanner sc = new Scanner(System.in);
+			do {
+				on=true; 
+				System.out.println("Ingrese la cadena orginal: ");
+				this.cadenaOriginal = sc.nextLine();
+				System.out.println("Ingrese el patrón de entrada: ");
+				this.patronER = sc.nextLine();
+				System.out.println("Ingrese la cadena reemplazadora: ");
+				this.cadenaReemplazadora = sc.nextLine();
+				
+				if((cadenaOriginal.equals(""))) {
+					on = false;
+					System.out.println("La cadena original esta vacia");
+				}
+				if((patronER.equals("")) || patronER == null) {
+					System.out.println("La cadena reemplazadora no puede ser de longitud 0 (cadena vacia)");				
+					on = false;
+				}
+				if(cadenaReemplazadora == null || cadenaReemplazadora.length()==0) {
+					if(!cadenaReemplazadora.equals("")) {
+						on = false;
+					}
+				}
+				if(on  == true) {
+					System.out.println("Se logro con exito");
+				}
+			}while(on ==false);
+			this.resultado = this.cadenaOriginal;
+			this.indexInicio = this.indexFinal = 0;
+			this.indexAL = new ArrayList<Integer>();
+			if(!this.patronER.equals("")) {
+				this.arrayER = new String[countMatches(patronER) + 1];
+				fillArrayER();	
+			}else {
+				this.arrayER = new String[0];
+			}
+			this.replacer();
+			System.out.println("Se ha generado: "+this.useSwap());
+			do {
+				System.out.println("Desea correr el programa [S/N]: ");
+				respuesta = sc.nextLine();
+			}while(!(respuesta.equals("S")||respuesta.equals("s")||respuesta.equals("N")||respuesta.equals("n")));
+		}while(respuesta.equals("S")||respuesta.equals("s"));
+		System.out.println("Bye");
+		
 	}
 	//Rellena el array de las parte de la ER
 	public void fillArrayER() {
@@ -121,7 +160,7 @@ public class Reemplazador {
 
 					if(pointerC <= this.arrayER[tries].length() && pointerA <= pointerC) {
 
-						System.out.println(this.cadenaOriginal.charAt(this.indexFinal)+"-"+this.arrayER[tries].charAt(pointerA));
+						//System.out.println(this.cadenaOriginal.charAt(this.indexFinal)+"-"+this.arrayER[tries].charAt(pointerA));
 
 						//checo que la derecha del simbolo se encuentre esta operacion
 						if(pointerB==pointerC && this.arrayER[tries].length() != 2) {
@@ -186,7 +225,7 @@ public class Reemplazador {
 											}
 										}
 										if(flag) {
-											System.out.println("Se ha llegado a un match dentro del CASO 1");
+											//System.out.println("Se ha llegado a un match dentro del CASO 1");
 										}
 									}							
 									//CASO 2: Elemento diferente a la derecha (a*b) -> b/ab/aab/aaa...b en donde no la 2da a no es cerradura manda a hacer bandera especial
@@ -283,7 +322,7 @@ public class Reemplazador {
 												}
 											}
 
-											System.out.println("Se ha llegado a un match dentro del CASO 3.1");
+											//System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 										}
 									}else {
 										if(flag) {
@@ -368,7 +407,7 @@ public class Reemplazador {
 												break;
 											}
 										}
-										System.out.println("Se ha llegado a un match dentro del CASO 3.1");
+										//System.out.println("Se ha llegado a un match dentro del CASO 3.1");
 
 									}
 									//A pesar de que esta se encuentre en todas partes, se tiene que validar.
@@ -379,7 +418,7 @@ public class Reemplazador {
 										this.indexFinal++;
 										flag = true; //Se ha validado que exista al menos una vez
 
-										System.out.println("Se ha llegado a un match dentro del CASO 3.2");
+										//System.out.println("Se ha llegado a un match dentro del CASO 3.2");
 										if(this.cadenaOriginal.length()==this.indexFinal) {
 
 											break;
@@ -387,7 +426,7 @@ public class Reemplazador {
 									}
 								}//CASO 3.3
 								else {
-									System.out.println("Se ha llegado a un match dentro del CASO 3.2");
+									//System.out.println("Se ha llegado a un match dentro del CASO 3.2");
 
 								}
 								if(pointerA <= pointerC) {
@@ -410,7 +449,7 @@ public class Reemplazador {
 									this.indexFinal++;
 									flag = true; //Se ha validado que exista al menos una vez
 									flagSpecialConc1 = true;
-									System.out.println("Se ha llegado a un match de concatenacion del CASO 1");
+									//System.out.println("Se ha llegado a un match de concatenacion del CASO 1");
 								}else {
 									flag = false;
 									flagSpecialConc1 = false;
@@ -421,7 +460,7 @@ public class Reemplazador {
 									this.indexFinal++;
 									flag = true; //Se ha validado que exista al menos una vez
 
-									System.out.println("Se ha llegado a un match de concatenacion CASO 2");
+								//	System.out.println("Se ha llegado a un match de concatenacion CASO 2");
 								}else {
 									flag = false;
 								}	
@@ -454,12 +493,12 @@ public class Reemplazador {
 							flag = true; //Se ha validado que exista al menos una vez
 
 						}else {
-							System.out.println("No se ha llegado a un match");
+							//System.out.println("No se ha llegado a un match");
 							flag = false;
 							break;
 						}
 					}if(flag == false) {
-						System.out.println("No se ha llegado a un match");
+						//System.out.println("No se ha llegado a un match");
 						flag = false;
 						break;
 					}
@@ -477,7 +516,7 @@ public class Reemplazador {
 					this.indexAL.add(this.indexInicio);
 					this.indexAL.add(this.indexFinal);
 					if(pointerB==this.arrayER[tries].length()){}
-					System.out.println("Inicio: "+this.indexInicio+" Final: "+this.indexFinal);
+					//System.out.println("Inicio: "+this.indexInicio+" Final: "+this.indexFinal);
 					if(situation) {
 						this.indexInicio = this.indexFinal=this.indexFinal+1;
 						situation=false;
@@ -504,13 +543,11 @@ public class Reemplazador {
 				tries++;
 			}
 		}
-		if(patronER.length() == 0) {
-			System.out.println("El patron no puede ser la cadena vacia");
-		}
+
 	}
 	public static void main(String[] args) {
-		Reemplazador rempExa = new Reemplazador("carlos come cevr", "c+a+r+m","ccc");
-		rempExa.replacer();
-		System.out.println(rempExa.useSwap());
+		ReemplazacorCon rempExa = new ReemplazacorCon();
 	}
 }
+
+
