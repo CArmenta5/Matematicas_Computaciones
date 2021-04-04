@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ReemplazacorCon {
+public class ReemplazadorCon {
 	private String cadenaOriginal ,
 	patronER,
 	cadenaReemplazadora,
@@ -11,7 +11,7 @@ public class ReemplazacorCon {
 	private int indexInicio,
 	indexFinal;	
 
-	public ReemplazacorCon() {
+	public ReemplazadorCon() {
 		String respuesta;	
 		
 		do {
@@ -21,7 +21,7 @@ public class ReemplazacorCon {
 				on=true; 
 				System.out.println("Ingrese la cadena orginal: ");
 				this.cadenaOriginal = sc.nextLine();
-				System.out.println("Ingrese el patrón de entrada: ");
+				System.out.println("Ingrese el patron de entrada: ");
 				this.patronER = sc.nextLine();
 				System.out.println("Ingrese la cadena reemplazadora: ");
 				this.cadenaReemplazadora = sc.nextLine();
@@ -546,7 +546,7 @@ public class ReemplazacorCon {
 
 	}
 	public static void main(String[] args) {
-		ReemplazacorCon rempExa = new ReemplazacorCon();
+		ReemplazadorCon rempExa = new ReemplazadorCon();
 	}
 }
 
